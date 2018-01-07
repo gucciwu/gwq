@@ -18,6 +18,11 @@ class BaseViewSet(viewsets.ModelViewSet):
     def perform_update(self, serializer):
         serializer.save(modified_by=self.request.user)
 
+    def perform_destroy(self, instance):
+        instance.deleted = True
+        instance.modified_by = self.request.user
+        instance.save()
+
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """

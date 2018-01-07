@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import QuerySet
-from datetime import datetime
+from django.utils import timezone
 
 
 def get_recycle_user():
@@ -19,12 +19,12 @@ class BaseQuerySet(QuerySet):
         self.update(deleted=False)
 
     def update(self, **kwargs):
-        self.update(modified_at=datetime.now())
+        self.update(modified_at=timezone.now())
         super().update()
 
     def touch(self, request):
         self.update(modified_by=request.User)
-        self.update(modified_time=datetime.now())
+        self.update(modified_time=timezone.now())
 
 
 class BaseModelManager(models.Manager):
@@ -58,7 +58,7 @@ class BaseModel(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
-        self.modified_at = datetime.now()
+        self.modified_at = timezone.now()
         super().save()
 
     def delete(self, using=None, keep_parents=False):
