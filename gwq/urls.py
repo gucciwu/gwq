@@ -18,15 +18,18 @@ from django.urls import path
 from django.conf.urls import url, include
 from rest_framework import routers
 from rest_framework_swagger.views import get_swagger_view
-from dictionary import views
+from dictionary.views import DictionaryViewSet
+from common.views import UserViewSet, GroupViewSet
 
 schema_view = get_swagger_view(title='APIs')
 
 router = routers.DefaultRouter()
-router.register(r'dictionary', views.DictionaryViewSet)
+router.register(r'dictionary', DictionaryViewSet)
+router.register(r'users', UserViewSet)
+router.register(r'groups', GroupViewSet)
 
 urlpatterns = [
-    url(r'^$', schema_view),
+    url(r'^apis/$', schema_view),
     url(r'^', include(router.urls)),
     path('admin/', admin.site.urls),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))

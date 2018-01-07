@@ -1,11 +1,10 @@
 from .models import Dictionary
-from rest_framework import serializers
+from common.serializers import BaseHyperlinkedModelSerializer
 
 
-class DictionarySerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
+class DictionarySerializer(BaseHyperlinkedModelSerializer):
+    class Meta(BaseHyperlinkedModelSerializer.Meta):
         model = Dictionary
-        fields = ('entry', 'key', 'value')
 
     def create(self, validated_data):
         return Dictionary.objects.create(**validated_data)
