@@ -12,6 +12,16 @@ class BaseQuerySet(QuerySet):
     def delete(self):
         self.update(deleted=True)
 
+    def force_delete(self):
+        super().delete()
+
+    def restore(self):
+        self.update(deleted=False)
+
+    def update(self, **kwargs):
+        self.update(modified_at=datetime.now())
+        super().update()
+
     def touch(self, request):
         self.update(modified_by=request.User)
         self.update(modified_time=datetime.now())
@@ -46,12 +56,21 @@ class BaseModel(models.Model):
 
     objects = BaseModelManager()
 
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        self.modified_at = datetime.now()
+        super().save()
+
     def delete(self, using=None, keep_parents=False):
         self.deleted = True
         self.save()
 
     def force_delete(self, using=None):
         super().delete(self, using)
+
+    def restore(self):
+        self.deleted = False
+        self.save()
 
     class Meta:
         abstract = True
