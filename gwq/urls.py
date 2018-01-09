@@ -18,13 +18,15 @@ from django.urls import path
 from django.conf.urls import url, include
 from rest_framework import routers
 from rest_framework_swagger.views import get_swagger_view
-from dictionary.views import DictionaryViewSet
+from dictionary.views import DictionaryViewSet, SecurityTypeViewSet, SecurityViewSet
 from common.views import UserViewSet, GroupViewSet
 
 schema_view = get_swagger_view(title='APIs')
 
 router = routers.DefaultRouter()
 router.register(r'dictionary', DictionaryViewSet)
+router.register(r'security', SecurityViewSet)
+router.register(r'security/type', SecurityTypeViewSet)
 router.register(r'users', UserViewSet)
 router.register(r'groups', GroupViewSet)
 
