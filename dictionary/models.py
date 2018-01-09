@@ -14,28 +14,4 @@ class Dictionary(BaseModel):
         db_table = 'dictionary'
 
 
-class SecurityType(BaseModel):
-    code = models.CharField(max_length=20)
-    name = models.CharField(max_length=40)
-
-    def __str__(self):
-        return self.name + '/' + self.code
-
-    class Meta:
-        db_table = 'security_type'
-
-
-class Security(BaseModel):
-    code = models.CharField(max_length=20)
-    name = models.CharField(max_length=40)
-    short = models.CharField(max_length=20)
-    type = models.ForeignKey(SecurityType, on_delete=models.PROTECT)
-
-    def __str__(self):
-        return self.name + '/' + self.code
-
-    class Meta:
-        db_table = 'security'
-
-
 

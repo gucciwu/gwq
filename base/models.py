@@ -78,5 +78,11 @@ class BaseModel(models.Model):
         self.deleted = False
         self.save()
 
+    def set_user(self, user):
+        self.owner = user
+        self.created_by = user
+        self.modified_by = user
+
     class Meta:
         abstract = True
+
