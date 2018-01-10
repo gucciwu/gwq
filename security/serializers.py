@@ -1,4 +1,5 @@
-from .models import Type, Security
+from .models import Security
+from dictionary.models import SecurityType
 from base.serializers import BaseHyperlinkedModelSerializer
 
 
@@ -20,10 +21,10 @@ class SecuritySerializer(BaseHyperlinkedModelSerializer):
 
 class SecurityTypeSerializer(BaseHyperlinkedModelSerializer):
     class Meta(BaseHyperlinkedModelSerializer.Meta):
-        model = Type
+        model = SecurityType
 
     def create(self, validated_data):
-        return Type.objects.create(**validated_data)
+        return SecurityType.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
         instance.code = validated_data.get('code', instance.code)

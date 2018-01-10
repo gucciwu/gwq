@@ -1,9 +1,9 @@
-from base.views import BaseViewSet, BaseAPIView
-from .models import Security, Type
-from .serializers import SecurityTypeSerializer, SecuritySerializer
+from base.views import BaseViewSet
+from .models import Security
+from dictionary.models import SecurityType
+from .serializers import SecuritySerializer
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from rest_framework.decorators import detail_route, list_route
+from rest_framework.decorators import list_route
 import logging
 
 
@@ -16,13 +16,16 @@ class SecurityViewSet(BaseViewSet):
 
     logger = logging.getLogger(__name__)
 
+    """
+    API endpoint that sync stock information.
+    """
     @list_route()
     def sync(self, *args, **kwargs):
         import tushare as ts
         stocks = ts.get_stock_basics()
         login_user = self.request.user
-        type_of_stock = Type.objects.get_or_create(code='stock', owner=login_user,
-                                                   modified_by=login_user, created_by=login_user)[0]
+        type_of_stock = SecurityType.objects.get_or_create(code='stock', owner=login_user,
+                                                           modified_by=login_user, created_by=login_user)[0]
 
         stock_base_info = stocks.loc[:, ['name', 'industry', 'area']]
         for index, row in stock_base_info.iterrows():
@@ -38,34 +41,3 @@ class SecurityViewSet(BaseViewSet):
         return Response(stocks.size)
 
 
-class SecurityTypeViewSet(BaseViewSet):
-    """
-    API endpoint that allows security type entries to be viewed or edited.
-    """
-    queryset = Type.objects.all().order_by('modified_at')
-    serializer_class = SecurityTypeSerializer
-
-
-class SecuritySync(BaseAPIView):
-    """
-    Sync security information
-    """
-    def post(self):
-        return Response(self.sync())
-
-    @api_view(['GET', 'POST'])
-    def sync(self):
-        import tushare as ts
-        stocks = ts.get_stock_basics()
-        type_of_stock = Type.objects.get_or_create(code='stock')[0]
-
-        for stock in stocks:
-            security = Security()
-            security.code = stock.code
-            security.name = stock.name
-            security.area = stock.area
-            security.industry = stock.industry
-            security.type = type_of_stock
-            security.save()
-
-        return stocks.size
