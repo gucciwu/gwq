@@ -1,5 +1,6 @@
 from base.models import BaseModel
 from django.db import models
+from django.utils.translation import gettext as _
 
 
 class System(BaseModel):
@@ -9,6 +10,9 @@ class System(BaseModel):
 
     def __str__(self):
         return self.entry + '/' + self.key
+
+    class Meta:
+        verbose_name = _('System')
 
 
 class Exchange(BaseModel):
@@ -26,3 +30,7 @@ class SecurityType(BaseModel):
 
     def __str__(self):
         return self.name + '/' + self.code
+
+    class Meta:
+        verbose_name = _('Security Type')
+        verbose_name_plural = _('Security Types')

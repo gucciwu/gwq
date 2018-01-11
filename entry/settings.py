@@ -55,7 +55,7 @@ MIDDLEWARE = [
     'django.middleware.locale.LocaleMiddleware',
 ]
 
-ROOT_URLCONF = 'gwq.urls'
+ROOT_URLCONF = 'entry.urls'
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend', # this is default
@@ -79,7 +79,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'gwq.wsgi.application'
+WSGI_APPLICATION = 'entry.wsgi.application'
 
 
 # Database
@@ -148,4 +148,14 @@ LOGGING = {
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
         },
     },
+}
+
+SITE = {
+    'name': 'GWQuant'
+}
+
+ADMIN_SITE = {
+    'site_title': SITE['name'] + ' admin',
+    'site_header': SITE['name'] + ' administration',
+    'index_title': SITE['name'] + ' administration',
 }
