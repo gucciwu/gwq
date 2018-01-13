@@ -25,9 +25,9 @@ from common.views import UserViewSet, GroupViewSet
 schema_view = get_swagger_view(title='APIs')
 
 router = routers.DefaultRouter()
-router.register(r'dictionary', DictionaryViewSet)
-router.register(r'security', SecurityViewSet)
-router.register(r'dictionary/security/type', SecurityTypeViewSet)
+router.register(r'dictionaries', DictionaryViewSet)
+router.register(r'securities', SecurityViewSet)
+router.register(r'security-types', SecurityTypeViewSet)
 router.register(r'users', UserViewSet)
 router.register(r'groups', GroupViewSet)
 

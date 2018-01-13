@@ -16,21 +16,26 @@ class System(BaseModel):
 
 
 class Exchange(BaseModel):
-    code = models.CharField(max_length=20, primary_key=True)
+    code = models.CharField(max_length=20, unique=True)
     name = models.CharField(max_length=100)
     country = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name + '/' + self.code
 
+    class Meta:
+        verbose_name = _('Exchange')
+        verbose_name_plural = _('Exchanges')
+
 
 class SecurityType(BaseModel):
-    code = models.CharField(max_length=20, primary_key=True)
+    code = models.CharField(max_length=20, unique=True)
     name = models.CharField(max_length=40)
 
     def __str__(self):
         return self.name + '/' + self.code
 
     class Meta:
+        db_table = _('dictionary_security_type')
         verbose_name = _('Security Type')
         verbose_name_plural = _('Security Types')

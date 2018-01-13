@@ -20,59 +20,26 @@ class UpdateDeletedError(Error):
 
 class BaseQuerySet(QuerySet):
 
-    """
-    For keeping modified, created and own fields correctly, query set must be touched b4 perform update operations,
-    that a flag for judge the queryset have been touched before delete, update and restore
-    """
-    touched = False
-
     def delete(self):
-        if not self.touched:
-            raise UpdateWithoutTouchError(_("QuerySet must be touched before delete!"))
-        self.update(deleted=True, modified_at=timezone.now())
-        self.touched = False
+        self.update(deleted=True, force_update_deleted=True, modified_at=timezone.now())
 
     def force_delete(self):
-        super().delete()
+        return super().delete()
 
     def restore(self):
-        if not self.touched:
-            raise UpdateWithoutTouchError(_("QuerySet must be touched before restore!"))
         self.update(deleted=False, modified_at=timezone.now())
-        self.touched = False
 
-    def update(self, **kwargs):
-        if not self.touched:
-            raise UpdateWithoutTouchError(_("QuerySet must be touched before update!"))
-        super().update(**kwargs)
-        self.touched = False
+    def update(self, force_update_deleted=False, **kwargs):
+
+        if not force_update_deleted and 'deleted' in kwargs.keys() and kwargs['deleted']:
+            raise UpdateDeletedError(_("Deleted record can not be update!"))
+        kwargs['modified_at'] = timezone.now()
+        return super().update(**kwargs)
 
     def create(self, **kwargs):
-        if not self.touched:
-            raise UpdateWithoutTouchError(_("QuerySet must be touched before create!"))
-        super().create()
-        self.touched = False
-
-    def touch(self, user=None, include_create=False, include_owner=False):
-        if user is None:
-            user = UserUtils.get_unknown_user()
-
-        if include_create:
-            if include_owner:
-                self.update(modified_time=timezone.now(), modified_by=user,
-                            created_time=timezone.now(), created_by=user,
-                            owner=user)
-            else:
-                self.update(modified_time=timezone.now(), modified_by=user,
-                            created_time=timezone.now(), created_by=user,
-                            )
-        else:
-            if include_owner:
-                self.update(modified_time=timezone.now(), modified_by=user, owner=user)
-            else:
-                self.update(modified_time=timezone.now(), modified_by=user)
-
-        self.touched = True
+        kwargs['modified_at'] = timezone.now()
+        kwargs['created_at'] = timezone.now()
+        return super().create(**kwargs)
 
 
 class BaseModelManager(models.Manager):
@@ -138,30 +105,33 @@ class BaseModel(models.Model):
              update_fields=None, force_update_deleted=False):
 
         if self.deleted and not force_update_deleted:
-            return
+            raise UpdateDeletedError(_("Deleted record can not be update!"))
 
         self._soft_touch()
-
+        self.modified_at = timezone.now()
         # set created_at and created_by in creating
         if self._get_pk_val is None:
             self.created_at = timezone.now()
             if self.created_by is None:
                 self.created_by = UserUtils.get_unknown_user()
 
-        super().save()
+        return super().save(force_insert, force_update, using, update_fields)
 
     def delete(self, using=None, keep_parents=False):
-        self._soft_touch()
+        # self._soft_touch()
+        self.modified_at = timezone.now()
         self.deleted = True
-        super().save(update_fields=('modified_by', 'modified_at', 'deleted'))
+        self.save(update_fields=('modified_by', 'modified_at', 'deleted'),
+                  force_update_deleted=True)
 
     def force_delete(self, using=None):
         super().delete(self, using)
 
     def restore(self):
-        self._soft_touch()
+        # self._soft_touch()
+        self.modified_at = timezone.now()
         self.deleted = False
-        super().save(update_fields=('modified_by', 'modified_at', 'deleted'))
+        return self.save(update_fields=('modified_by', 'modified_at', 'deleted'))
 
     def set_user(self, user=None):
         if user is None:

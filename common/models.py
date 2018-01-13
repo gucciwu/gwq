@@ -13,3 +13,9 @@ class UserUtils:
     @staticmethod
     def get_unknown_user():
         return User.objects.get_or_create(username='UNKNOWN')[0]
+
+    @staticmethod
+    def get_use_from_request(request):
+        return request.user._wrapped \
+            if hasattr(request.user, '_wrapped') \
+            else request.user

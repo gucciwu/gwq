@@ -13,6 +13,7 @@ class SystemModelAdmin(BaseModelAdmin):
 
 class SecurityTypeModelAdmin(BaseModelAdmin):
     list_display = ('code', 'name') + BaseModelAdmin.list_display
+    list_editable = ['name']
 
 
 admin.site.register(Exchange, ExchangeModelAdmin)
