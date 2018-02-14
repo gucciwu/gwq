@@ -19,3 +19,4 @@ class UserUtils:
         return request.user._wrapped \
             if hasattr(request.user, '_wrapped') \
             else request.user
+

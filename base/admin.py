@@ -10,6 +10,7 @@ class BaseModelAdmin(admin.ModelAdmin):
                     'created_at', 'created_by',
                     'modified_at', 'modified_by',
                     'deleted', '__str__')
+    list_display_links = ['__str__']
 
     def extend_list(self, extends=None):
         if extends is not None:
