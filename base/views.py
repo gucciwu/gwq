@@ -22,14 +22,14 @@ class BaseViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminUser,)
 
     def perform_create(self, serializer):
-        user = UserUtils.get_use_from_request(self.request)
+        user = UserUtils.get_user_from_request(self.request)
         instance = serializer.save(owner=user, created_by=user, modified_by=user)
         message = '%s added %s' % (user.username, str(instance))
         self.log_addition(user, instance, message)
 
     def perform_update(self, serializer):
         instance = serializer.save()
-        user = UserUtils.get_use_from_request(self.request)
+        user = UserUtils.get_user_from_request(self.request)
         instance.modified_by = user
         instance.modified_at = timezone.now()
         instance.save()
@@ -38,7 +38,7 @@ class BaseViewSet(viewsets.ModelViewSet):
 
     def perform_destroy(self, instance):
         instance.deleted = True
-        user = UserUtils.get_use_from_request(self.request)
+        user = UserUtils.get_user_from_request(self.request)
         instance.modified_by = user
         instance.modified_at = timezone.now()
         instance.save(force_update_deleted=True)

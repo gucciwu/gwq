@@ -13,9 +13,11 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url, include
+
+# Django Admin
+from django.contrib import admin
 
 # REST Framework
 from rest_framework import routers
@@ -24,13 +26,12 @@ from rest_framework_jwt.views import obtain_jwt_token
 from rest_framework_jwt.views import refresh_jwt_token
 from rest_framework_jwt.views import verify_jwt_token
 
-
 # Modules
 from dictionary.views import DictionaryViewSet, SecurityTypeViewSet
 from security.views import SecurityViewSet
-from common.views import UserViewSet, GroupViewSet
+from common.views import UserViewSet, GroupViewSet, current_user
 
-schema_view = get_swagger_view(title='APIs')
+schema_view = get_swagger_view(title='API Reference')
 
 router = routers.DefaultRouter()
 router.register(r'dictionaries', DictionaryViewSet)
@@ -40,11 +41,12 @@ router.register(r'users', UserViewSet)
 router.register(r'groups', GroupViewSet)
 
 urlpatterns = [
-    url(r'^', include(router.urls)),
+    url(r'^api/', include(router.urls)),
+    url(r'^api/users/current', current_user),
     path('admin/', admin.site.urls),
-    url(r'^apis/$', schema_view),
-    url(r'^api-token-auth/', obtain_jwt_token),
-    url(r'^api-token-refresh/', refresh_jwt_token),
-    url(r'^api-token-verify/', verify_jwt_token),
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    url(r'^doc/$', schema_view),
+    url(r'^api/token/auth/', obtain_jwt_token),
+    url(r'^api/token/refresh/', refresh_jwt_token),
+    url(r'^api/token/verify/', verify_jwt_token),
+    url(r'^api/auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
